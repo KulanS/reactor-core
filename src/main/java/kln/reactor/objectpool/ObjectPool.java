@@ -19,16 +19,24 @@ public class ObjectPool<T> {
     public ObjectPool(PoolConfig poolConfig, ObjectFactory<T> objectFactory) {
         this.config = poolConfig;
         this.factory = objectFactory;
-        this.partitions = new ObjectPoolPartition[config.getPartitionSize()];
+        this.partitions = getArray(config.getPartitionSize());
+        
         for (int i = 0; i < config.getPartitionSize(); i++) {
             partitions[i] = new ObjectPoolPartition<>(this, i, config, objectFactory, createBlockingQueue(poolConfig));
         }
+        
         if (config.getScavengeIntervalMilliseconds() > 0) {
             this.scavenger = new Scavenger();
             this.scavenger.start();
         }
     }
-
+    
+    @SuppressWarnings("unchecked")
+    private ObjectPoolPartition<T>[] getArray(int size) {
+		ObjectPoolPartition<T>[] array = new ObjectPoolPartition[size];
+    	return array;
+    }
+    
     protected BlockingQueue<Poolable<T>> createBlockingQueue(PoolConfig poolConfig) {
         return new ArrayBlockingQueue<>(poolConfig.getMaxSize());
     }
@@ -62,7 +70,7 @@ public class ObjectPool<T> {
         throw new PoolInvalidObjectException();
     }
 
-    @SuppressWarnings({"java:S112", "java:S2142"})
+    
     private Poolable<T> getObject(boolean noTimeout) {
         if (shuttingDown) {
             throw new IllegalStateException("Your pool is shutting down");
@@ -97,7 +105,6 @@ public class ObjectPool<T> {
         return freeObject;
     }
 
-    @SuppressWarnings({"java:S112", "java:S2142"})
     public void returnObject(Poolable<T> obj) {
         ObjectPoolPartition<T> subPool = this.partitions[obj.getPartition()];
         try {
@@ -133,7 +140,7 @@ public class ObjectPool<T> {
 
     private class Scavenger extends Thread {
 
-        @Override @SuppressWarnings({"java:S2142", "java:S108"})
+        @Override
         public void run() {
             int partition = 0;
             while (!ObjectPool.this.shuttingDown) {

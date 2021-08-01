@@ -23,9 +23,11 @@ public class ObjectPoolPartition<T> {
         this.objectFactory = objectFactory;
         this.partition = partition;
         this.objectQueue = queue;
+        
         for (int i = 0; i < config.getMinSize(); i++) {
             objectQueue.add(new Poolable<>(objectFactory.create(), pool, partition));
         }
+        
         totalCount = config.getMinSize();
     }
 
@@ -37,7 +39,7 @@ public class ObjectPoolPartition<T> {
      * @param delta the number to increase
      * @return the actual number of increased objects
      */
-    @SuppressWarnings({"java:S112", "java:S2142"})
+    
     public synchronized int increaseObjects(int delta) {
         if (delta + totalCount > config.getMaxSize()) {
             delta = config.getMaxSize() - totalCount;

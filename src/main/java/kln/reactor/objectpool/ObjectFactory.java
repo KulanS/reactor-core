@@ -1,8 +1,5 @@
 package kln.reactor.objectpool;
 
-/**
- * @author Daniel
- */
 public interface ObjectFactory<T> {
 
     /**
