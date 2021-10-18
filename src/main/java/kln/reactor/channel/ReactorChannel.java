@@ -168,11 +168,11 @@ public abstract class ReactorChannel {
 	}
 	
 	protected void createChannel(Class<?> bootstrapClass) throws Exception {
-		Object o = bootstrapClass.newInstance();
-		if(o instanceof ServerBootstrap) {
-			serverBootstrap = (ServerBootstrap)o;
-		}else if(o instanceof Bootstrap) {
-			clientBootstrap = (Bootstrap)o;
+		Object object = bootstrapClass.newInstance();
+		if(object instanceof ServerBootstrap) {
+			serverBootstrap = (ServerBootstrap)object;
+		}else if(object instanceof Bootstrap) {
+			clientBootstrap = (Bootstrap)object;
 		}
 		if(os == OS_TYPE.LINUX) {
 			masterGroup = new EpollEventLoopGroup(masterThreads);
@@ -181,11 +181,11 @@ public abstract class ReactorChannel {
 			masterGroup = new NioEventLoopGroup(masterThreads);
 			slaveGroup = new NioEventLoopGroup(slaveThreads);
 		}
-		if(o instanceof ServerBootstrap) {
-			serverBootstrap = (ServerBootstrap)o;
+		if(object instanceof ServerBootstrap) {
+			serverBootstrap = (ServerBootstrap)object;
 			serverBootstrap.group(masterGroup, slaveGroup);
-		}else if(o instanceof Bootstrap){
-			clientBootstrap = (Bootstrap)o;
+		}else if(object instanceof Bootstrap){
+			clientBootstrap = (Bootstrap)object;
 			clientBootstrap.group(masterGroup);
 		}
 	}
